@@ -155,7 +155,7 @@ def max_pool(bottom, ks, stride=1, train=False):
 #     return to_tempfile(str(n.to_proto()))
 
 def minialexnet(data, labels=None, train=False, param=learned_param,
-                num_classes=100, with_labels=True):
+                num_classes=1000, with_labels=True):
     """
     Returns a protobuf text file specifying a variant of AlexNet, following the
     original specification (<caffe>/models/bvlc_alexnet/train_val.prototxt).
@@ -176,31 +176,31 @@ def minialexnet(data, labels=None, train=False, param=learned_param,
 
     n.pool4 = max_pool(n.relu3, 2, stride=2, train=train)
 
-    n.conv5, n.relu5 = conv_relu(n.pool4, 3, 384, pad=1, group = 3, **conv_kwargs)
+    # n.conv5, n.relu5 = conv_relu(n.pool4, 3, 384, pad=1, group = 3, **conv_kwargs)
 
-    n.pool6 = max_pool(n.relu5, 3, stride=2, train=train)
+    # n.pool6 = max_pool(n.relu5, 3, stride=2, train=train)
 
-    n.conv6, n.relu6 = conv_relu(n.pool6, 5, 384, pad=2, group = 3, **conv_kwargs)
+    # n.conv6, n.relu6 = conv_relu(n.pool6, 5, 384, pad=2, group = 3, **conv_kwargs)
 
-    n.pool7 = max_pool(n.relu6, 3, stride=2, train=train)
+    # n.pool7 = max_pool(n.relu6, 3, stride=2, train=train)
 
-    n.conv7, n.relu7 = conv_relu(n.pool7, 5, 192, pad=2, group = 3, **conv_kwargs)
+    # n.conv7, n.relu7 = conv_relu(n.pool7, 5, 192, pad=2, group = 3, **conv_kwargs)
 
-    n.pool8 = max_pool(n.relu7, 2, stride=2, train=train)
+    # n.pool8 = max_pool(n.relu7, 2, stride=2, train=train)
 
-    n.conv8, n.relu8 = conv_relu(n.pool8, 3, 96, pad=1, group = 3, **conv_kwargs)
+    # n.conv8, n.relu8 = conv_relu(n.pool8, 3, 96, pad=1, group = 3, **conv_kwargs)
 
-    n.pool9 = max_pool(n.relu8, 2, stride=2, train=train)
+    # n.pool9 = max_pool(n.relu8, 2, stride=2, train=train)
 
-    n.fc9, n.relu9 = fc_relu(n.pool9, 1024, param=param)
+    # n.fc9, n.relu9 = fc_relu(n.pool9, 1024, param=param)
 
-    n.drop8 = L.Dropout(n.relu9, in_place=True)
+    # n.drop8 = L.Dropout(n.relu9, in_place=True)
 
-    n.fc10, n.relu10 = fc_relu(n.drop8, 1024, param=param)
+    n.fc10, n.relu10 = fc_relu(n.pool4, 1024, param=param)
 
     n.drop9 = L.Dropout(n.relu10, in_place=True)
 
-    preds = n.fc11 = L.InnerProduct(n.drop9, num_output=1, param=param)
+    preds = n.fc11 = L.InnerProduct(n.drop9, num_output=num_classes, param=param)
 
     if not train:
         # Compute the per-label probabilities at test/inference time.
@@ -258,7 +258,7 @@ def minialexnet(data, labels=None, train=False, param=learned_param,
 
 
 def get_split(split):
-    filename = './development_kit/data/%s.txt' % split
+    filename = './%s.txt' % split
     if not os.path.exists(filename):
         raise IOError('Split data file not found: %s' % split)
     return filename

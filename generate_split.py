@@ -6,10 +6,10 @@ def generate_split(train_size,test_size):
 
 	with open('train.txt','w') as f:
 		for i in range(0,train_size):
-			f.write('%d.jpg %d\n'% (i,math.ceil(price_list[i])))
+			f.write('/Users/Soroush/Documents/Apps/Caffe/caffe/python/images/%d.jpg %d\n'% (i,math.ceil(price_list[i])))
 
 	with open('test.txt', 'w') as f:
 		for i in range(train_size,train_size+test_size):
-			f.write('%d.jpg %d\n'%(i,math.ceil(price_list[i])))
+			f.write('/Users/Soroush/Documents/Apps/Caffe/caffe/python/images/%d.jpg %d\n'%(i,math.ceil(price_list[i])))
 
-generate_split(10,23)
+generate_split(100000,1000)
