@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(
     description='Train and evaluate a net on the product images dataset.')
 parser.add_argument('--image_root', default='./images/',
     help='Directory where images are stored')
-parser.add_argument('--crop', type=int, default=96,
+parser.add_argument('--crop', type=int, default=10,
     help=('The edge length of the random image crops'
           '(defaults to 96 for 96x96 crops)'))
 parser.add_argument('--disp', type=int, default=10,
@@ -155,7 +155,7 @@ def max_pool(bottom, ks, stride=1, train=False):
 #     return to_tempfile(str(n.to_proto()))
 
 def minialexnet(data, labels=None, train=False, param=learned_param,
-                num_classes=1000, with_labels=True):
+                num_classes=10, with_labels=True):
     """
     Returns a protobuf text file specifying a variant of AlexNet, following the
     original specification (<caffe>/models/bvlc_alexnet/train_val.prototxt).
