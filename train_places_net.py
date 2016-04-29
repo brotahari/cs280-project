@@ -9,7 +9,7 @@ import tempfile
 import time
 
 parser = argparse.ArgumentParser(
-    description='Train and evaluate a net on the MIT mini-places dataset.')
+    description='Train and evaluate a net on the product images dataset.')
 parser.add_argument('--image_root', default='./images/',
     help='Directory where images are stored')
 parser.add_argument('--crop', type=int, default=10,
