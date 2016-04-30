@@ -29,7 +29,7 @@ parser.add_argument('--iter_size', type=int, default=2,
     help=('The number of iterations (batches) over which to average the '
           'gradient computation. Effectively increases the batch size '
           '(--batch) by this factor, but without increasing memory use '))
-parser.add_argument('--lr', type=float, default=0.00003,
+parser.add_argument('--lr', type=float, default=0.00000003,
     help='The initial learning rate')
 parser.add_argument('--gamma', type=float, default=0.1,
     help='Factor by which to drop the learning rate')

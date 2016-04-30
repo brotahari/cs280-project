@@ -1,6 +1,10 @@
 import gzip
 import json
 import urllib
+import json
+from PIL import Image
+import os
+import numpy
 
 def parse(path):
   g = gzip.open(path, 'r')
@@ -13,29 +17,45 @@ def load(path):
 data = parse('./meta_Electronics.json.gz')
 
 price_list = []
+cat_list = []
 count = 0
-for i in data:
-	a = json.loads(i)
-	try:
-		price_list.append(a['price'])
-		try:
-			urllib.urlretrieve(a['imUrl'], "./images/%d.jpg"%count)
-			count = count + 1
-		except KeyError:
-			print('keyError URL')
-			price_list.pop(len(price_list)-1)
-			continue
-		except IOError:
-			print('IOError')
-			price_list.pop(len(price_list)-1)
-			continue
-		except:
-			print("Unexpected Error")
-			price_list.pop(len(price_list)-1)
-			continue
-	except KeyError:
-		print('keyError Price')
-		continue
+items = 0
+with open('./price_list.txt', 'w') as f:
+    f.write('')
+with open('./cat_list.txt', 'w') as f:
+    f.write('')
 
-with open('./price_list.json','w') as f:
-	json.dump(price_list,f)
+for i in data:
+        items += 1
+	a = json.loads(i)
+        if count > 5000:
+            break
+	try:
+            price_line = "%d.jpg "%count + str(int(a['price'])) +"\n"
+            cat_line =  "%d.jpg "%count + str(a['categories']) + "\n"
+            try:
+                img_path = "./images/%d.jpg"%count
+            	urllib.urlretrieve(a['imUrl'], img_path)
+            except KeyError:
+                print('keyError URL')
+                continue
+            if not os.stat(img_path).st_size == 0:
+                im = Image.open(img_path)
+                im_a = numpy.array(im)
+                try:
+                    im_a.shape[2]
+                    if im.size != (60, 40):
+                        count = count + 1
+                        with open('./price_list.txt', 'a') as f:
+                            f.write(price_line)
+                        with open('./cat_list.txt', 'a') as f:
+                            f.write(cat_line)
+                except IndexError:
+                    print('Single Channel')
+
+
+
+	except KeyError:
+            print('keyError Price')
+            continue
+
