@@ -28,7 +28,7 @@ with open('./cat_list.txt', 'w') as f:
 for i in data:
         items += 1
 	a = json.loads(i)
-        if count > 5000:
+        if count > 2000:
             break
 	try:
             price_line = "%d.jpg "%count + str(int(a['price'])) +"\n"
@@ -44,7 +44,7 @@ for i in data:
                 im_a = numpy.array(im)
                 try:
                     im_a.shape[2]
-                    if im.size != (60, 40):
+                    if (im.size[0] > 96) and (im.size[1] > 96):
                         count = count + 1
                         with open('./price_list.txt', 'a') as f:
                             f.write(price_line)
