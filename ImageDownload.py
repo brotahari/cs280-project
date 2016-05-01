@@ -24,15 +24,18 @@ with open('./price_list.txt', 'w') as f:
     f.write('')
 with open('./cat_list.txt', 'w') as f:
     f.write('')
+with open('./log_list.txt', 'w') as f:
+    f.write('')
+
 
 for i in data:
         items += 1
 	a = json.loads(i)
-        if count > 10000:
+        if count > 5000:
             break
 	try:
-            price_line = "%d.jpg "%count + str(float(a['price'])) +"\n"
-            log_line = "%d.jpg "%count + str(numpy.log(float(a['price']))) +"\n"
+            price_line = "%d.jpg "%count + str(int(a['price'])) +"\n"
+            log_line = "%d.jpg "%count + str(int(10000*numpy.log10(float(a['price'])))) +"\n"
 	    cat_line =  "%d.jpg "%count + str(a['categories']) + "\n"
             try:
                 img_path = "./images/%d.jpg"%count
@@ -49,7 +52,7 @@ for i in data:
                         count = count + 1
                         with open('./price_list.txt', 'a') as f:
                             f.write(price_line)
-			with open('./train.txt', 'a') as f:
+			with open('./log_list.txt', 'a') as f:
 			    f.write(log_line)
                         with open('./cat_list.txt', 'a') as f:
                             f.write(cat_line)

@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(
     description='Train and evaluate a net on the product images dataset.')
 parser.add_argument('--image_root', default='./images/',
     help='Directory where images are stored')
-parser.add_argument('--crop', type=int, default=10,
+parser.add_argument('--crop', type=int, default=24,
     help=('The edge length of the random image crops'
           '(defaults to 96 for 96x96 crops)'))
 parser.add_argument('--disp', type=int, default=10,
