@@ -21,7 +21,7 @@ parser.add_argument('--snapshot_dir', default='./snapshot',
     help='Path to directory where snapshots are saved')
 parser.add_argument('--snapshot_prefix', default='place_net',
     help='Snapshot filename prefix')
-parser.add_argument('--iters', type=int, default=0*50*1000 + 10,
+parser.add_argument('--iters', type=int, default= 1000,
     help='Total number of iterations to train the network')
 parser.add_argument('--batch', type=int, default=100,
     help='The batch size to use for training')
@@ -33,7 +33,7 @@ parser.add_argument('--lr', type=float, default=0.000001,
     help='The initial learning rate')
 parser.add_argument('--gamma', type=float, default=0.1,
     help='Factor by which to drop the learning rate')
-parser.add_argument('--stepsize', type=int, default=10*1000,
+parser.add_argument('--stepsize', type=int, default=100,
     help='Drop the learning rate every N iters -- this specifies N')
 parser.add_argument('--momentum', type=float, default=0.5,
     help='The momentum hyperparameter to use for momentum SGD')
@@ -43,7 +43,7 @@ parser.add_argument('--seed', type=int, default=1,
     help='Seed for the random number generator')
 parser.add_argument('--cudnn', action='store_true',
     help='Use CuDNN at training time -- usually faster, but non-deterministic')
-parser.add_argument('--gpu', type=int, default=-1,
+parser.add_argument('--gpu', type=int, default=0,
     help='GPU ID to use for training and inference (-1 for CPU)')
 args = parser.parse_args()
 
