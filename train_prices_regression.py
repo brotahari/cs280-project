@@ -7,6 +7,8 @@ import numpy as np
 import os
 import tempfile
 import time
+import json
+import random
 
 parser = argparse.ArgumentParser(
     description='Train and evaluate a net on the product images dataset.')
@@ -21,7 +23,7 @@ parser.add_argument('--snapshot_dir', default='./snapshot',
     help='Path to directory where snapshots are saved')
 parser.add_argument('--snapshot_prefix', default='place_net',
     help='Snapshot filename prefix')
-parser.add_argument('--iters', type=int, default= 1000,
+parser.add_argument('--iters', type=int, default= 200,
     help='Total number of iterations to train the network')
 parser.add_argument('--batch', type=int, default=100,
     help='The batch size to use for training')
@@ -35,7 +37,7 @@ parser.add_argument('--gamma', type=float, default=0.1,
     help='Factor by which to drop the learning rate')
 parser.add_argument('--stepsize', type=int, default=100,
     help='Drop the learning rate every N iters -- this specifies N')
-parser.add_argument('--momentum', type=float, default=0.5,
+parser.add_argument('--momentum', type=float, default=0.7,
     help='The momentum hyperparameter to use for momentum SGD')
 parser.add_argument('--decay', type=float, default=5e-4,
     help='The L2 weight decay coefficient')
@@ -43,7 +45,7 @@ parser.add_argument('--seed', type=int, default=1,
     help='Seed for the random number generator')
 parser.add_argument('--cudnn', action='store_true',
     help='Use CuDNN at training time -- usually faster, but non-deterministic')
-parser.add_argument('--gpu', type=int, default=0,
+parser.add_argument('--gpu', type=int, default=-1,
     help='GPU ID to use for training and inference (-1 for CPU)')
 args = parser.parse_args()
 
@@ -127,13 +129,19 @@ def minialexnet(data, labels=None, train=False, param=learned_param,
     n = caffe.NetSpec()
     n.data = data
     conv_kwargs = dict(param=param, train=train)
-    n.conv1, n.relu1 = conv_relu(n.data, 3, 96, pad=1, **conv_kwargs)
-    n.pool2 = max_pool(n.relu1, 2, stride=2, train=train)
-    n.conv3, n.relu3 = conv_relu(n.pool2, 3, 192, pad=1, group = 3, **conv_kwargs)
+    n.conv1, n.relu1 = conv_relu(n.data, 12, 96, pad=4, **conv_kwargs)
+    n.conv2, n.relu2 = conv_relu(n.relu1, 9, 96, pad=3, **conv_kwargs)
+    n.pool2 = max_pool(n.relu2, 2, stride=2, train=train)
+    n.conv3, n.relu3 = conv_relu(n.pool2, 6, 192, pad=2, group = 3, **conv_kwargs)
     n.pool4 = max_pool(n.relu3, 2, stride=2, train=train)
-    n.fc10, n.relu10 = fc_relu(n.pool4, 1024, param=param)
-    n.drop9 = L.Dropout(n.relu10, in_place=True)
-    n.pred = L.InnerProduct(n.drop9, num_output=1, param=param)
+    n.conv4, n.relu4 = conv_relu(n.pool4, 3, 192, pad=1, group = 3, **conv_kwargs)
+    n.pool5 = max_pool(n.relu4, 4, stride=2, train=train)
+    #n.pool6 = max_pool(n.pool5, 2, stride=1, train=train)
+    n.fc6, n.relu6 = fc_relu(n.pool5, 1024, param=param)
+    n.drop6 = L.Dropout(n.relu6, in_place=True)
+    n.fc7, n.relu7 = fc_relu(n.drop6, 1024, param=param)
+    n.drop7 = L.Dropout(n.relu7, in_place=True)
+    n.pred = L.InnerProduct(n.drop7, num_output=1, param=param)
 
     if train:
         n.label = labels
@@ -149,6 +157,7 @@ def get_split(split):
 
 def miniplaces_net(source, train=False, with_labels=True):
     mean = [104, 117, 123]  # per-channel mean of the BGR image pixels
+    #mean = [int(255*random.random()),int(255*random.random()),int(255*random.random())]
     transform_param = dict(mirror=train, crop_size=args.crop, mean_value=mean)
     batch_size = args.batch if train else 100
     places_data, places_labels = L.ImageData(transform_param=transform_param,
@@ -294,7 +303,7 @@ def eval_net(split):
             assert 1 <= len(parts) <= 2, 'malformed line'
             filenames.append(parts[0])
             if len(parts) > 1:
-                labels.append(int(parts[1]))
+                labels.append(float(parts[1]))
     known_labels = (len(labels) > 0)
     if known_labels:
         assert len(labels) == len(filenames)
@@ -336,8 +345,9 @@ def eval_net(split):
         print "Image{:6d}".format(i), ": Original price = {0:6.2f}, Predicted price = {1:6.2f}, Error = {2:6.2f} ".format(p, p + pdiff, pdiff)
     sorted_price_diff[:10]
 
-    with open('./indexed_price_diff.txt', 'w') as f:
-        f.write(str(indexed_price_diff))
+    with open('./indexed_price_diff.json', 'w') as f:
+        json.dump(indexed_price_diff,f)
+        #f.write(str(indexed_price_diff))
 
 if __name__ == '__main__':
     print 'Training net...\n'
