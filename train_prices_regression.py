@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(
     description='Train and evaluate a net on the product images dataset.')
 parser.add_argument('--image_root', default='./images/',
     help='Directory where images are stored')
-parser.add_argument('--crop', type=int, default=24,
+parser.add_argument('--crop', type=int, default=36,
     help=('The edge length of the random image crops'
           '(defaults to 96 for 96x96 crops)'))
 parser.add_argument('--disp', type=int, default=10,
@@ -23,7 +23,7 @@ parser.add_argument('--snapshot_dir', default='./snapshot',
     help='Path to directory where snapshots are saved')
 parser.add_argument('--snapshot_prefix', default='place_net',
     help='Snapshot filename prefix')
-parser.add_argument('--iters', type=int, default= 200,
+parser.add_argument('--iters', type=int, default= 10000,
     help='Total number of iterations to train the network')
 parser.add_argument('--batch', type=int, default=100,
     help='The batch size to use for training')
@@ -33,9 +33,9 @@ parser.add_argument('--iter_size', type=int, default=2,
           '(--batch) by this factor, but without increasing memory use '))
 parser.add_argument('--lr', type=float, default=0.000001,
     help='The initial learning rate')
-parser.add_argument('--gamma', type=float, default=0.1,
+parser.add_argument('--gamma', type=float, default=0.01,
     help='Factor by which to drop the learning rate')
-parser.add_argument('--stepsize', type=int, default=100,
+parser.add_argument('--stepsize', type=int, default=500,
     help='Drop the learning rate every N iters -- this specifies N')
 parser.add_argument('--momentum', type=float, default=0.7,
     help='The momentum hyperparameter to use for momentum SGD')
@@ -45,7 +45,7 @@ parser.add_argument('--seed', type=int, default=1,
     help='Seed for the random number generator')
 parser.add_argument('--cudnn', action='store_true',
     help='Use CuDNN at training time -- usually faster, but non-deterministic')
-parser.add_argument('--gpu', type=int, default=-1,
+parser.add_argument('--gpu', type=int, default=0,
     help='GPU ID to use for training and inference (-1 for CPU)')
 args = parser.parse_args()
 
@@ -101,6 +101,10 @@ def conv_relu(bottom, ks, nout, stride=1, pad=0, group=1,
                          **engine)
     return conv, L.ReLU(conv, in_place=True)
 
+def batch_norm(bottom):
+    bn = L.LRN(bottom, local_size=3, alpha=5e-5, beta=.75, norm_region=1)
+    return bn
+
 def fc_relu(bottom, nout, param=learned_param,
             weight_filler=fc_filler, bias_filler=zero_filler):
     fc = L.InnerProduct(bottom, num_output=nout, param=param,
@@ -132,12 +136,15 @@ def minialexnet(data, labels=None, train=False, param=learned_param,
     n.conv1, n.relu1 = conv_relu(n.data, 12, 96, pad=4, **conv_kwargs)
     n.conv2, n.relu2 = conv_relu(n.relu1, 9, 96, pad=3, **conv_kwargs)
     n.pool2 = max_pool(n.relu2, 2, stride=2, train=train)
-    n.conv3, n.relu3 = conv_relu(n.pool2, 6, 192, pad=2, group = 3, **conv_kwargs)
+    n.bn2 = batch_norm(n.pool2)
+    n.conv3, n.relu3 = conv_relu(n.bn2, 6, 192, pad=2, group = 2, **conv_kwargs)
     n.pool4 = max_pool(n.relu3, 2, stride=2, train=train)
-    n.conv4, n.relu4 = conv_relu(n.pool4, 3, 192, pad=1, group = 3, **conv_kwargs)
-    n.pool5 = max_pool(n.relu4, 4, stride=2, train=train)
-    #n.pool6 = max_pool(n.pool5, 2, stride=1, train=train)
-    n.fc6, n.relu6 = fc_relu(n.pool5, 1024, param=param)
+    n.bn4 = batch_norm(n.pool4)
+    n.conv4, n.relu4 = conv_relu(n.bn4, 3, 192, pad=1, group = 2, **conv_kwargs)
+    n.pool5 = max_pool(n.relu4, 3, stride=2, train=train)
+    n.pool6 = max_pool(n.pool5, 3, stride=1, train=train)
+    n.bn6 = batch_norm(n.pool6)
+    n.fc6, n.relu6 = fc_relu(n.bn6, 1024, param=param)
     n.drop6 = L.Dropout(n.relu6, in_place=True)
     n.fc7, n.relu7 = fc_relu(n.drop6, 1024, param=param)
     n.drop7 = L.Dropout(n.relu7, in_place=True)
