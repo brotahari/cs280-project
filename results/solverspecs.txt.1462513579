@@ -1,0 +1,16 @@
+train_net: "/tmp/tmpOAyevd"
+test_interval: 1001
+base_lr: 0.0001
+display: 10
+max_iter: 1000
+lr_policy: "step"
+gamma: 0.1
+momentum: 0.9
+weight_decay: 0.005
+stepsize: 100
+snapshot: 50
+snapshot_prefix: "./snapshot/place_net"
+random_seed: 1
+average_loss: 10
+iter_size: 2
+type: "SGD"
