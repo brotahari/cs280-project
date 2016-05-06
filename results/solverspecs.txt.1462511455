@@ -1,0 +1,16 @@
+train_net: "/tmp/tmptGscs4"
+test_interval: 301
+base_lr: 1e-06
+display: 10
+max_iter: 300
+lr_policy: "step"
+gamma: 0.1
+momentum: 0.7
+weight_decay: 0.0005
+stepsize: 100
+snapshot: 50
+snapshot_prefix: "./snapshot/place_net"
+random_seed: 1
+average_loss: 10
+iter_size: 2
+type: "SGD"
