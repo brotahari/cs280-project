@@ -35,7 +35,7 @@ parser.add_argument('--lr', type=float, default=0.000001,
     help='The initial learning rate')
 parser.add_argument('--gamma', type=float, default=0.1,
     help='Factor by which to drop the learning rate')
-parser.add_argument('--stepsize', type=int, default=100,
+parser.add_argument('--stepsize', type=int, default=200,
     help='Drop the learning rate every N iters -- this specifies N')
 parser.add_argument('--momentum', type=float, default=0.7,
     help='The momentum hyperparameter to use for momentum SGD')
