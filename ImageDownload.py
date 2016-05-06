@@ -27,21 +27,30 @@ with open('./cat_list.txt', 'w') as f:
 with open('./log_list.txt', 'w') as f:
     f.write('')
 
+urls = set()
 
 for i in data:
         items += 1
 	a = json.loads(i)
-        if count > 5000:
+        if count > 2000:
             break
 	try:
-            price_line = "%d.jpg "%count + str(int(a['price'])) +"\n"
-            log_line = "%d.jpg "%count + str(int(10000*numpy.log10(float(a['price'])))) +"\n"
+	    if a['price'] < 1.0:
+		continue
+            price_line = "%d.jpg "%count + str(float(a['price'])) +"\n"
+            log_line = "%d.jpg "%count + str(float(numpy.log10(float(a['price'])))) +"\n"
 	    cat_line =  "%d.jpg "%count + str(a['categories']) + "\n"
             try:
                 img_path = "./images/%d.jpg"%count
-            	urllib.urlretrieve(a['imUrl'], img_path)
+		if img_path not in urls:
+            		urllib.urlretrieve(a['imUrl'], img_path)
+			urls.update(img_path)
+		else:
+			print ('Duplicate')
+			continue
+		
             except KeyError:
-                print('keyError URL')
+                #print('keyError URL')
                 continue
             if not os.stat(img_path).st_size == 0:
                 im = Image.open(img_path)
@@ -60,8 +69,7 @@ for i in data:
                     print('Single Channel')
 
 
-
 	except KeyError:
-            print('keyError Price')
+            #print('keyError Price')
             continue
 
