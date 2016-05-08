@@ -39,7 +39,14 @@ for i in data:
 		continue
             price_line = "%d.jpg "%count + str(float(a['price'])) +"\n"
             log_line = "%d.jpg "%count + str(float(numpy.log10(float(a['price'])))) +"\n"
-	    cat_line =  "%d.jpg "%count + str(a['categories']) + "\n"
+            log_price = numpy.log10(float(a['price']))
+            if log_price < 1.01:
+                cat = 1
+            elif log_price < 1.53:
+                cat = 2
+            else:
+                cat = 3
+            cat_line = "%d.jpg "%count + str(cat)+"\n"
             try:
                 img_path = "./images/%d.jpg"%count
 		if img_path not in urls:
