@@ -41,11 +41,11 @@ for i in data:
             log_line = "%d.jpg "%count + str(float(numpy.log10(float(a['price'])))) +"\n"
             log_price = numpy.log10(float(a['price']))
             if log_price < 1.01:
-                cat = 1
+                cat = 0
             elif log_price < 1.53:
-                cat = 2
+                cat = 1
             else:
-                cat = 3
+                cat = 2
             cat_line = "%d.jpg "%count + str(cat)+"\n"
             try:
                 img_path = "./images/%d.jpg"%count
