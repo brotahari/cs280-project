@@ -17,7 +17,7 @@ parser.add_argument('--image_root', default='./images/',
 parser.add_argument('--crop', type=int, default=96,
     help=('The edge length of the random image crops'
           '(defaults to 96 for 96x96 crops)'))
-parser.add_argument('--disp', type=int, default=1,
+parser.add_argument('--disp', type=int, default=10,
     help='Print loss/accuracy every --disp training iterations')
 parser.add_argument('--snapshot_dir', default='./snapshot',
     help='Path to directory where snapshots are saved')
@@ -31,11 +31,11 @@ parser.add_argument('--iter_size', type=int, default=2,
     help=('The number of iterations (batches) over which to average the '
           'gradient computation. Effectively increases the batch size '
           '(--batch) by this factor, but without increasing memory use '))
-parser.add_argument('--lr', type=float, default=1e-4,
+parser.add_argument('--lr', type=float, default=1e-2,
     help='The initial learning rate')
 parser.add_argument('--gamma', type=float, default=0.1,
     help='Factor by which to drop the learning rate')
-parser.add_argument('--stepsize', type=int, default=100,
+parser.add_argument('--stepsize', type=int, default=1000,
     help='Drop the learning rate every N iters -- this specifies N')
 parser.add_argument('--momentum', type=float, default=0.7,
     help='The momentum hyperparameter to use for momentum SGD')
@@ -45,7 +45,7 @@ parser.add_argument('--seed', type=int, default=1,
     help='Seed for the random number generator')
 parser.add_argument('--cudnn', action='store_true',
     help='Use CuDNN at training time -- usually faster, but non-deterministic')
-parser.add_argument('--gpu', type=int, default=-1,
+parser.add_argument('--gpu', type=int, default=0,
     help='GPU ID to use for training and inference (-1 for CPU)')
 args = parser.parse_args()
 
